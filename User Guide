@@ -17,7 +17,7 @@ pip install requests beautifulsoup4 pandas openpyxl
 
 ---
 
-## 🧩 Function Breakdown
+## Function Breakdown
 
 ### 1. `scrape_program_page(url, year_range="2025-2026")`
 - **Purpose:** Scrapes a program sequence page for course codes.  
@@ -99,3 +99,6 @@ For each program URL:
 Each sheet contains:
 - Program name + year range at the top.
 - Captions and tables summarizing course categories.
+
+## XLSX File
+If you don't have mircosoft excel, download the xlsx file and open via google sheets.
