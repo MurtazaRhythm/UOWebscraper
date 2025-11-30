@@ -1,0 +1,101 @@
+Documentation for Program Sequence Scraper
+
+Required Libraries
+
+Before running the script, install the following Python libraries via **command prompt (cmd)**:
+
+```bash
+pip install requests beautifulsoup4 pandas openpyxl
+```
+
+- **requests** → For sending HTTP requests and retrieving HTML content from program pages.  
+- **beautifulsoup4** → For parsing and navigating the HTML structure.  
+- **re (regex)** → Built-in Python library for pattern matching course codes.  
+- **collections.Counter** → Built-in Python library for counting occurrences of course prefixes.  
+- **pandas** → For creating and formatting tabular data.  
+- **openpyxl** → Required by pandas to write data into Excel files (`.xlsx`).
+
+---
+
+## 🧩 Function Breakdown
+
+### 1. `scrape_program_page(url, year_range="2025-2026")`
+- **Purpose:** Scrapes a program sequence page for course codes.  
+- **Process:**
+  - Downloads the HTML page using `requests`.
+  - Parses the page with `BeautifulSoup`.
+  - Finds all `<caption>` elements that contain `"Course sequence"` and the specified `year_range`.
+  - Extracts course codes from `<li><strong>...</strong></li>` elements.
+  - Cleans codes (removes spaces).
+  - Uses regex to capture the **prefix** (e.g., `CSI`, `MAT`, `PHY`).
+  - Counts how many courses belong to each prefix using `Counter`.
+  - Calculates percentages relative to total courses.
+  - Returns a dictionary:  
+    ```python
+    {
+      "Caption text": DataFrame(Category, Count, %)
+    }
+    ```
+
+---
+
+### 2. `main()`
+- **Purpose:** Coordinates scraping multiple program URLs and saves results into an Excel file.  
+- **Process:**
+  - Prompts user to enter one or more program URLs (comma-separated).
+  - Iterates through each URL:
+    - Calls `scrape_program_page`.
+    - If data is found:
+      - Creates a new Excel sheet named after the last part of the URL (max 31 characters).
+      - Writes a header row with program name and year range.
+      - Writes each caption and its corresponding DataFrame below it.
+    - If no data is found, prints a message.
+  - Saves everything into **`program_reports.xlsx`**.
+
+---
+
+## Excel Output Explanation
+
+The script generates an Excel file named **`program_reports.xlsx`**.  
+
+For each program URL:
+- A **separate sheet** is created (named after the URL’s last segment).  
+- The sheet contains:
+  1. **Header row:**  
+     ```
+     ProgramName – 2025-2026
+     ```
+  2. **Caption title:** (e.g., `"Course sequence – 2025-2026"`)  
+  3. **Table of categories:**  
+
+     | Category | Count | %   |
+     |----------|-------|-----|
+     | CSI      | 5     | 25% |
+     | MAT      | 3     | 15% |
+     | PHY      | 2     | 10% |
+     | ...      | ...   | ... |
+
+- Multiple captions (if present on the page) are written one after another, separated by blank rows.
+
+---
+
+## Example Workflow
+
+1. Run the script:
+   ```bash
+   python program_scraper.py
+   ```
+2. Input URLs when prompted:
+   ```
+   Enter program URLs (comma separated if multiple):
+   https://example.com/software-engineering, https://example.com/computer-science
+   ```
+3. Output:
+   - Console prints scraping progress.
+   - Excel file `program_reports.xlsx` is created with sheets:
+     - `software-engineering`
+     - `computer-science`
+
+Each sheet contains:
+- Program name + year range at the top.
+- Captions and tables summarizing course categories.
